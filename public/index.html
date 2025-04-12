@@ -1,11 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
+    <style>
+        body,
+        canvas {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Don't Tap It</title>
 </head>
-<body>
-    <h1>It works</h1>
+
+<body onload="init()">
+    <canvas id="canvas-id" width="800" height="600">
+        <script>
+            // Function to preload images
+            (function preloadImages() {
+                const imageNameList = ["green_tile", "black_tile"];
+                const imageBackupColorList = ["green", "black"];
+
+                for (let i = 0; i < imageNameList.length; i++) {
+                    let name = imageNameList[i],
+                        backupColor = imageBackupColorList[i];
+
+                    if (name.indexOf("[") > -1) {
+                        let arrayName = name.slice(0, name.indexOf("["));
+                        let arrayNumber = name.slice(name.indexOf("[") + 1, name.indexOf("]"));
+                        if (!window[arrayName]) {
+                            window[arrayName] = [];
+                        }
+                        window[arrayName][arrayNumber] = tryToLoad(name, backupColor);
+                    } else {
+                        window[name] = tryToLoad(name, backupColor);
+                    }
+                }
+            }());
+
+            function tryToLoad(imageNameWithoutDotPng, backupColor) {
+                let result = {};
+                result.img = new Image();
+                result.img.src = "images/" + imageNameWithoutDotPng + ".png";
+                result.color = backupColor;
+                return result;
+            }
+
+            function tryToLoadWithFullPath(imageNameAndPath, backupColor) {
+                let result = {};
+                result.img = new Image();
+                result.img.src = imageNameAndPath;
+                result.color = backupColor;
+                return result;
+            }
+
+            function drawImage(imageWithBackupColorObject, x, y, xs, ys) {
+                try {
+                    if (xs !== undefined) {
+                        context.drawImage(imageWithBackupColorObject.img, x, y, xs, ys);
+                    } else {
+                        context.drawImage(imageWithBackupColorObject.img, x, y);
+                    }
+                } catch (e) {
+                    context.fillStyle = imageWithBackupColorObject.color;
+                    if (xs == null) {
+                        xs = 100;
+                        ys = 100;
+                    }
+                    context.fillRect(x, y, xs, ys);
+                }
+            }
+
+            let canvas, context;
+
+            function init() {
+                canvas = document.getElementById("canvas-id");
+                context = canvas.getContext("2d");
+                window.canvas = canvas;
+                window.context = context;
+
+                window.addEventListener("mousemove", function (e) {
+                    mouseX = e.pageX - canvas.offsetLeft;
+                    mouseY = e.pageY - canvas.offsetTop;
+                });
+
+                window.addEventListener("mousedown", mousedown);
+
+                redraw();
+                setInterval(update, 10);
+            }
+
+            let mouseX = 0;
+            let mouseY = 0;
+
+            function mousedown() {
+                console.log("Mouse clicked at:", mouseX, mouseY);
+            }
+
+            function redraw() {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                draw();
+                context.globalAlpha = 1;
+                context.font = "10px Arial";
+                reqAnimationFrame(redraw);
+            };
+
+            function reqAnimationFrame(callback) {
+                setTimeout(callback, 1000 / 30);
+            }
+
+        </script>
+        <!-- user's game file -->
+        <script src="script.js"></script>
+    </canvas>
 </body>
+
 </html>
