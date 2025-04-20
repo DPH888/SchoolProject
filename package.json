@@ -3,13 +3,19 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "This is a school team project. The goal is to recreate the game [White Tile, Don't Tap It](https://www.donttap.com/) using JavaScript and SQL.  \r This project is for educational purposes only and is not affiliated with the original game.",
   "dependencies": {
-    "express": "^4.21.2"
-  }
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.14.0"
+  },
+  "type": "commonjs"
 }

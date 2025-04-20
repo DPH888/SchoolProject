@@ -12,8 +12,9 @@ This project was created by a team of students working together.
 1. **Clone the repository**
 
 git clone https://github.com/DPH888/SchoolProject.git
-cd SchoolProject
+cd SchoolProject 
 
+Or you can download it directly
 2. **Install Node.js dependencies**
 
 Make sure you have [Node.js](https://nodejs.org/) installed on your computer.
@@ -25,15 +26,17 @@ npm install
 3. **Set up the SQL database**
 
 - Make sure you have MySQL installed and running locally.
-- Once the SQL file (e.g. `database.sql`) is available in the project, import it using a tool like phpMyAdmin or via terminal:
-  ```bash
-  mysql -u root -p your_database_name < path/to/database.sql
+- Open MySQL Workbench or terminal and run the following SQL:
+  ```sql
+  CREATE DATABASE reaction_game;
+USE reaction_game;
 
-host: 'localhost',
-user: 'root',
-password: 'Admin',
-database: 'Dont_Tap_It'
-
+CREATE TABLE scores (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  reaction_time INT NOT NULL,
+  clicked_squares INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 4. **Start the Node.js server**
 
