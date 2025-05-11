@@ -5,7 +5,7 @@ let animFrames = 30;
 
 let grid = [];
 let active = [];
-let gameState = { isGameOver: false, idleTime: 0 };
+let gameState = { isGameOver: false, idleTime: 0, clickedSquares: 0, startTime: Date.now() };
 
 function initGrid() {
     for (let r = 0; r < rows; r++) {
@@ -40,6 +40,8 @@ function activateRandomCell() {
 function resetGame() {
     gameState.isGameOver = false;
     gameState.idleTime = 0;
+    gameState.clickedSquares = 0;
+    gameState.startTime = Date.now();
     active = [];
     initGrid();
     while (active.length < maxActive) activateRandomCell();
@@ -71,6 +73,7 @@ function draw() {
         context.fillStyle = "red";
         context.font = "40px Arial";
         context.fillText("Game Over!", canvas.width / 2 - 100, 50);
+        context.fillText(`Score: ${gameState.clickedSquares}`, canvas.width / 2 - 100, 100);
     }
 }
 
@@ -83,10 +86,11 @@ function update() {
         }
     }
 
-    while (activeCells.length < maxActive) activateRandomCell();
+    while (active.length < maxActive) activateRandomCell();
 
     if (++gameState.idleTime > 120) gameState.isGameOver = true;
 }
+
 function handleClick(x, y) {
     if (gameState.isGameOver) {
         resetGame();
@@ -99,13 +103,15 @@ function handleClick(x, y) {
     let row = Math.floor((y - offsetY) / size);
     let col = Math.floor((x - offsetX) / size);
 
+    if (row < 0 || row >= rows || col < 0 || col >= cols) return;
+
     let cell = grid[row][col];
 
     if (cell.active && !cell.clicked) {
         cell.clicked = true;
         cell.active = false;
         cell.anim = animFrames;
-
+        gameState.clickedSquares++;
         for (let i = active.length - 1; i >= 0; i--) {
             if (active[i].r === row && active[i].c === col) {
                 active.splice(i, 1);
@@ -115,6 +121,19 @@ function handleClick(x, y) {
         gameState.idleTime = 0;
     } else {
         gameState.isGameOver = true;
+        
+        const reactionTime = Date.now() - gameState.startTime; 
+        fetch("/save-score", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                reaction_time: reactionTime,
+                clicked_squares: gameState.clickedSquares
+            })
+        })
+        .then(response => response.text())
+        .then(data => console.log(data))
+        .catch(error => console.log("Error saving score:", error));
     }
 }
 
