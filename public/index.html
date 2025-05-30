@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <style>
         body,
@@ -18,11 +17,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <meta charset="UTF-8">
 </head>
-
 <body onload="init()">
     <canvas id="canvas-id" width="800" height="600">
         <script>
-            // Function to preload images
             (function preloadImages() {
                 const imageNameList = ["green_tile", "black_tile"];
                 const imageBackupColorList = ["green", "black"];
@@ -41,6 +38,21 @@
                     } else {
                         window[name] = tryToLoad(name, backupColor);
                     }
+                }
+            }());
+
+            (function preloadSounds() {
+                const soundNameList = [
+                    "note_A3", "note_A4", "note_B3", "note_B4",
+                    "note_C3", "note_C4", "note_C5", "note_D3",
+                    "note_D4", "note_D5", "note_E3", "note_E4",
+                    "note_F3", "note_F4", "note_G3", "note_G4"
+                ];
+
+                for (let i = 0; i < soundNameList.length; i++) {
+                    let name = soundNameList[i];
+                    window[name] = new Audio(`sounds/${name}.mp3`);
+                    window[name].volume = 0.8;
                 }
             }());
 
@@ -109,16 +121,13 @@
                 context.globalAlpha = 1;
                 context.font = "10px Arial";
                 reqAnimationFrame(redraw);
-            };
+            }
 
             function reqAnimationFrame(callback) {
                 setTimeout(callback, 1000 / 30);
             }
-
         </script>
-        <!-- user's game file -->
         <script src="script.js"></script>
     </canvas>
 </body>
-
 </html>

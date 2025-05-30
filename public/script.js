@@ -7,11 +7,18 @@ let grid = [];
 let active = [];
 let gameState = { isGameOver: false, idleTime: 0, clickedSquares: 0, startTime: Date.now() };
 
+const soundMap = [
+    ["note_A3", "note_A4", "note_B3", "note_B4"],
+    ["note_C3", "note_C4", "note_C5", "note_D3"],
+    ["note_D4", "note_D5", "note_E3", "note_E4"],
+    ["note_F3", "note_F4", "note_G3", "note_G4"]
+];
+
 function initGrid() {
     for (let r = 0; r < rows; r++) {
         grid[r] = [];
         for (let c = 0; c < cols; c++) {
-            grid[r][c] = { active: false, clicked: false, anim: 0 };
+            grid[r][c] = { active: false, clicked: false, anim: 0, sound: soundMap[r][c] };
         }
     }
 }
@@ -50,7 +57,7 @@ function resetGame() {
 function draw() {
     let size = Math.min(canvas.width, canvas.height) / rows * 0.7;
     let offsetX = (canvas.width - cols * size) / 2;
-    let offsetY = (canvas.height - rows * size) / 2;
+    let offsetY = (canvas.height - rows * size) / 2+70;
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -99,7 +106,7 @@ function handleClick(x, y) {
 
     let size = Math.min(canvas.width, canvas.height) / rows * 0.7;
     let offsetX = (canvas.width - cols * size) / 2;
-    let offsetY = (canvas.height - rows * size) / 2;
+    let offsetY = (canvas.height - rows * size) / 2+70;
     let row = Math.floor((y - offsetY) / size);
     let col = Math.floor((x - offsetX) / size);
 
@@ -112,6 +119,10 @@ function handleClick(x, y) {
         cell.active = false;
         cell.anim = animFrames;
         gameState.clickedSquares++;
+        if (window[cell.sound]) {
+            window[cell.sound].currentTime = 0; 
+            window[cell.sound].play().catch(error => console.log("Sound play error:", error));
+        }
         for (let i = active.length - 1; i >= 0; i--) {
             if (active[i].r === row && active[i].c === col) {
                 active.splice(i, 1);
@@ -121,8 +132,7 @@ function handleClick(x, y) {
         gameState.idleTime = 0;
     } else {
         gameState.isGameOver = true;
-        
-        const reactionTime = Date.now() - gameState.startTime; 
+        const reactionTime = Date.now() - gameState.startTime;
         fetch("/save-score", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
